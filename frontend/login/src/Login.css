@@ -134,6 +134,19 @@
   color: #b91c1c;
 }
 
+.login-card__toggle {
+  margin-top: 16px;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-card__toggle:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 720px) {
   .login-card__intro {
     text-align: center;
