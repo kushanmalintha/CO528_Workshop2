@@ -1,16 +1,22 @@
 import { useState } from "react";
 import "./Login.css";
 
+const API_BASE = "http://localhost:3000/api";
+
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [mode, setMode] = useState("login");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage({ type: "", text: "" });
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const endpoint =
+        mode === "signup" ? `${API_BASE}/auth/signup` : `${API_BASE}/auth/login`;
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -21,15 +27,24 @@ function Login({ onLogin }) {
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage({ type: "error", text: data.message || "Login failed" });
+        const fallback =
+          mode === "signup" ? "Signup failed" : "Login failed";
+        setMessage({ type: "error", text: data.message || fallback });
         return;
       }
 
-      console.log("Login successful:", data);
+      if (mode === "signup") {
+        setMessage({
+          type: "success",
+          text: "Account created! Please log in.",
+        });
+        setMode("login");
+        setPassword("");
+        return;
+      }
 
       onLogin?.(data.token);
       setMessage({ type: "success", text: "Login successful ✅" });
-
     } catch (error) {
       setMessage({ type: "error", text: "Server error" });
     }
@@ -52,9 +67,11 @@ function Login({ onLogin }) {
           </div>
         </div>
         <div className="login-card__form">
-          <h2>Welcome back</h2>
+          <h2>{mode === "signup" ? "Create an account" : "Welcome back"}</h2>
           <p className="login-card__subtitle">
-            Enter your account credentials to continue.
+            {mode === "signup"
+              ? "Sign up to start tracking your inventory."
+              : "Enter your account credentials to continue."}
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -80,7 +97,9 @@ function Login({ onLogin }) {
               />
             </label>
 
-            <button type="submit">Login</button>
+            <button type="submit">
+              {mode === "signup" ? "Create account" : "Login"}
+            </button>
           </form>
 
           {message.text && (
@@ -88,6 +107,19 @@ function Login({ onLogin }) {
               {message.text}
             </p>
           )}
+
+          <button
+            className="login-card__toggle"
+            type="button"
+            onClick={() => {
+              setMessage({ type: "", text: "" });
+              setMode((prev) => (prev === "login" ? "signup" : "login"));
+            }}
+          >
+            {mode === "signup"
+              ? "Already have an account? Log in"
+              : "Need an account? Sign up"}
+          </button>
         </div>
       </div>
     </div>

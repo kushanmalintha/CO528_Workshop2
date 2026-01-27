@@ -21,7 +21,7 @@ function App() {
   return (
     <div className="app-shell">
       {isAuthenticated ? (
-        <Dashboard onLogout={handleLogout} />
+        <Dashboard token={token} onLogout={handleLogout} />
       ) : (
         <Login onLogin={handleLogin} />
       )}

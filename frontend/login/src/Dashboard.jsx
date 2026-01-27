@@ -3,7 +3,7 @@ import "./Dashboard.css";
 
 const API_BASE = "http://localhost:3000/api";
 
-function Dashboard({ onLogout }) {
+function Dashboard({ token, onLogout }) {
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -13,13 +13,25 @@ function Dashboard({ onLogout }) {
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
 
+  const authHeaders = useMemo(
+    () => ({
+      Authorization: `Bearer ${token}`,
+    }),
+    [token]
+  );
+
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/products`);
+      const response = await fetch(`${API_BASE}/products`, {
+        headers: authHeaders,
+      });
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          onLogout?.();
+        }
         throw new Error(data?.message || "Unable to load products.");
       }
 
@@ -69,6 +81,7 @@ function Dashboard({ onLogout }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...authHeaders,
         },
         body: JSON.stringify({
           name: formData.name.trim(),
@@ -80,6 +93,9 @@ function Dashboard({ onLogout }) {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          onLogout?.();
+        }
         throw new Error(data?.message || "Unable to add product.");
       }
 
