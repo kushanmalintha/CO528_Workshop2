@@ -112,7 +112,7 @@ function Dashboard({ token, onLogout }) {
       <header className="dashboard__header">
         <div>
           <p className="dashboard__eyebrow">Inventory Hub</p>
-          <h1>Welcome back 👋</h1>
+          <h1>Welcome back</h1>
           <p className="dashboard__subtext">
             Track product availability, adjust inventory, and add new stock in
             seconds.
@@ -139,7 +139,7 @@ function Dashboard({ token, onLogout }) {
           <h3>
             {new Intl.NumberFormat("en-US", {
               style: "currency",
-              currency: "USD",
+              currency: "LKR",
             }).format(totalValue)}
           </h3>
           <span>Estimated retail worth</span>
@@ -165,7 +165,7 @@ function Dashboard({ token, onLogout }) {
               />
             </label>
             <label>
-              Price (USD)
+              Price (LKR)
               <input
                 name="price"
                 type="number"
@@ -225,7 +225,7 @@ function Dashboard({ token, onLogout }) {
                   <div>
                     <h3>{product.name}</h3>
                     <p className="product-card__meta">
-                      ${Number(product.price).toFixed(2)} ·{" "}
+                      LKR {Number(product.price).toFixed(2)} ·{" "}
                       {product.quantity} units
                     </p>
                   </div>
