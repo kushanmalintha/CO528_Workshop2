@@ -1,4 +1,5 @@
 const pool = require("../db");
+const { publishDomainEvent } = require("../eventBus/eventPublisher");
 
 exports.createProduct = async (req, res) => {
   const { name, price, quantity } = req.body;
@@ -10,7 +11,26 @@ exports.createProduct = async (req, res) => {
       "INSERT INTO products (name, price, quantity) VALUES ($1, $2, $3) RETURNING *",
       [name, price, quantity]
     );
-    res.status(201).json(result.rows[0]);
+    const product = result.rows[0];
+
+    const domainEvent = {
+      eventName: "ProductCreated",
+      entityId: product.id,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        name: product.name,
+        price: product.price,
+        quantity: product.quantity,
+        requestedBy: req.user
+          ? { id: req.user.id, username: req.user.username }
+          : null,
+        source: "products.create"
+      }
+    };
+
+    publishDomainEvent(domainEvent);
+
+    res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
